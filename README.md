@@ -13,7 +13,6 @@ import { create } from 'lemonpi-soft-landing-helper';
 
 create({
   // Required fields, retrieve these IDs from LemonPI
-  advertiserId: 0,
   templateId: 0,
   adsetId: 0,
 
@@ -45,8 +44,12 @@ Or directly in the browser:
 - **`content`** (`object` of `function` values)
   - **`...`** (`function`)
     The key has to match with a preexisting content field in LemonPI. Use the `value` argument to do something with the dynamic content result for this field.
+- **`templateId`** (`regex`)
+  The template ID derrived from LemonPI.
+- **`adsetId`** (`regex`)
+  The adset ID derrived from LemonPI.
 - **`urlTest`** (`regex`)
-  Only create when this regular expression matches `window.location.href`.
+  Only initialize when this regular expression matches `window.location.href`.
 - **`interval`** (`number`, default: `500`)
   The delay between execution attempts in milliseconds.
 - **`debug`** (`boolean`, default: `/lemonpi_debug/i.test(window.location.href)`)

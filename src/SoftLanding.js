@@ -1,3 +1,5 @@
+import { getUrlQueryParameters } from './helpers';
+
 export default class SoftLanding {
   constructor(config) {
     this.consoleStyling = 'padding:1px 6px 0;border-radius:2px;background:#fedc00;color:#313131';
@@ -52,7 +54,7 @@ export default class SoftLanding {
 
   getDynamicContent() {
     try {
-      const { advertiserId, adsetId, templateId } = this.config;
+      const { advertiserId = 0, adsetId, templateId } = this.config;
       const xhr = new XMLHttpRequest();
 
       xhr.open(
@@ -66,9 +68,7 @@ export default class SoftLanding {
       xhr.send(
         JSON.stringify({
           context: {
-            $request: {
-              timestamp: '2019-07-06T17:08:45+02:00',
-            },
+            'query-parameters': getUrlQueryParameters(),
           },
         }),
       );
@@ -83,12 +83,33 @@ export default class SoftLanding {
     return undefined;
   }
 
+  sendImpression() {
+    try {
+      const { adsetId, templateId } = this.config;
+      const xhr = new XMLHttpRequest();
+      const payload = {
+        type: 'impression',
+        schema: 'adset-creative',
+        adsetId,
+        creativeId: templateId,
+      };
+
+      xhr.open(
+        'GET',
+        `https://d.lemonpi.io/track/event?e=${encodeURIComponent(JSON.stringify(payload))}`,
+        true,
+      );
+
+      xhr.send();
+    } catch (_) {} // eslint-disable-line no-empty
+  }
+
   create() {
     // Clear errors for every new attempt
     this.errors = {};
 
     // Check for required IDs
-    ['advertiserId', 'adsetId', 'templateId'].forEach(requiredField => {
+    ['adsetId', 'templateId'].forEach(requiredField => {
       if (!this.config[requiredField]) {
         this.addError(requiredField, 'is required and missing');
       } else if (typeof this.config[requiredField] !== 'number') {
@@ -120,6 +141,7 @@ export default class SoftLanding {
 
               if (Object.keys(this.config.content).length === this.successfulFields) {
                 this.logSuccess('Successfully created soft landing');
+                this.sendImpression();
               }
             } catch ({ message }) {
               if (lastErrorMessage !== message) {
