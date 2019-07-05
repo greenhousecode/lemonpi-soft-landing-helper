@@ -1,4 +1,5 @@
 // Returns all URL query parameters
+// eslint-disable-next-line import/prefer-default-export
 export const getUrlQueryParameters = () =>
   window.location.search
     .replace(/^\?/, '')

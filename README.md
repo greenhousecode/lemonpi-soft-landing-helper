@@ -1,5 +1,7 @@
 # LemonPI Soft Landing Helper
 
+> Easily create LemonPI dynamic soft landings on webpages, based on URL query string context, by automatically executing conditions for each content field.
+
 ## Install
 
 ```shell

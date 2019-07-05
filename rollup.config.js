@@ -3,7 +3,7 @@ import { terser } from 'rollup-plugin-terser';
 import babel from 'rollup-plugin-babel';
 import json from 'rollup-plugin-json';
 import moment from 'moment';
-import { name, version } from './package.json';
+import { name, version, main, module } from './package.json';
 
 const banner = `/*! ${name} v${version} ${moment().format('YYYY/MM/DD')} */`;
 
@@ -13,7 +13,7 @@ export default [
     plugins: [resolve(), json(), babel(), terser({ output: { comments: /^!/ } })],
     output: {
       banner,
-      file: 'dist/bundle.umd.js',
+      file: main,
       format: 'umd',
       name: 'lemonpiSoftLandingHelper',
     },
@@ -23,7 +23,7 @@ export default [
     plugins: [resolve(), json()],
     output: {
       banner,
-      file: 'dist/bundle.esm.js',
+      file: module,
       format: 'esm',
     },
   },
