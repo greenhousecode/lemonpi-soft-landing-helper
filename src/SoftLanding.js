@@ -2,6 +2,7 @@ export default class SoftLanding {
   constructor(config) {
     this.consoleStyling = 'padding:1px 6px 0;border-radius:2px;background:#fedc00;color:#313131';
     this.dynamicContent = null;
+    this.successfulFields = 0;
     this.errors = {};
     this.config = {
       debug: /lemonpi_debug/i.test(window.location.href),
@@ -51,11 +52,12 @@ export default class SoftLanding {
 
   getDynamicContent() {
     try {
+      const { advertiserId, adsetId, templateId } = this.config;
       const xhr = new XMLHttpRequest();
 
       xhr.open(
         'POST',
-        `https://d.lemonpi.io/a/${this.config.advertiserId}/content/${this.config.adsetId}-${this.config.templateId}`,
+        `https://d.lemonpi.io/a/${advertiserId}/content/${adsetId}-${templateId}`,
         false, // Sync for now
       );
 
@@ -108,16 +110,15 @@ export default class SoftLanding {
         } else if (typeof this.config.content[field] !== 'function') {
           this.addError(field, 'should be a function');
         } else {
-          let successfulFields = 0;
           let lastErrorMessage = null;
 
           const attempt = setInterval(() => {
             try {
               this.config.content[field](this.dynamicContent[field].value);
               clearInterval(attempt);
-              successfulFields += 1;
+              this.successfulFields += 1;
 
-              if (Object.keys(this.config.content).length === successfulFields) {
+              if (Object.keys(this.config.content).length === this.successfulFields) {
                 this.logSuccess('Successfully created soft landing');
               }
             } catch ({ message }) {
