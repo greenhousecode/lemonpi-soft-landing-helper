@@ -1,0 +1,23 @@
+{
+  "name": "lemonpi-soft-landing-helper",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "lint": "eslint --ignore-path .gitignore .",
+    "precommit": "npm run lint"
+  },
+  "author": "Rick Stevens <rick.stevens@greenhousegroup.com> (http://www.greenhousegroup.com/)",
+  "repository": "github:greenhousecode/lemonpi-soft-landing-helper",
+  "license": "ISC",
+  "bugs": "https://github.com/greenhousecode/lemonpi-soft-landing-helper/issues",
+  "homepage": "https://github.com/greenhousecode/lemonpi-soft-landing-helper#readme",
+  "devDependencies": {
+    "eslint": "^5.3.0",
+    "eslint-config-airbnb-base": "^13.1.0",
+    "eslint-config-prettier": "^6.0.0",
+    "eslint-plugin-import": "^2.18.0",
+    "eslint-plugin-prettier": "^3.1.0",
+    "prettier": "^1.18.2"
+  }
+}
