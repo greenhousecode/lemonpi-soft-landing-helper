@@ -1,160 +1,118 @@
-import { getUrlQueryParameters } from './helpers';
+import { getUrlQueryParameters, fetch } from './helpers';
+
+const requiredFields = { adsetId: 'number', templateId: 'number', content: 'object' };
+const getFormattedConsoleMessage = (message, messageStyle = '') => [
+  `%cSoft Landing Helper%c ${message}`,
+  'padding:1px 6px 0;border-radius:2px;background:#fedc00;color:#313131',
+  messageStyle,
+];
 
 export default class SoftLanding {
   constructor(config) {
-    this.consoleStyling = 'padding:1px 6px 0;border-radius:2px;background:#fedc00;color:#313131';
-    this.dynamicContent = null;
-    this.successfulFields = 0;
-    this.errors = {};
+    this.createdContentFields = 0;
+    this.hasErrors = false;
     this.config = {
       debug: /lemonpi_debug/i.test(window.location.href),
-      interval: 250,
+      interval: 100,
       urlTest: /$/,
       content: {},
       ...config,
     };
 
-    this.create();
+    this.init();
   }
 
   logSuccess(message, ...args) {
     if (this.config.debug) {
-      console.log(
-        `%cSoft Landing Helper%c ${message}`,
-        this.consoleStyling,
-        'color:green',
-        ...args.slice(1),
-      );
+      console.log(...getFormattedConsoleMessage(message, 'color:green'), ...args);
     }
   }
 
-  addError(subject, ...args) {
-    if (!this.errors[subject]) {
-      this.errors[subject] = args;
-    }
-  }
+  logError(message, ...args) {
+    this.hasErrors = true;
 
-  logErrors() {
     if (this.config.debug) {
-      Object.keys(this.errors).forEach(subject =>
-        console.error(
-          `%cSoft Landing Helper%c ${subject}%c ${this.errors[subject][0]}`,
-          this.consoleStyling,
-          'font-weight:bold',
-          '',
-          ...this.errors[subject].slice(1),
-        ),
-      );
+      console.error(...getFormattedConsoleMessage(message), ...args);
     }
   }
 
-  hasErrors() {
-    return !!Object.keys(this.errors).length;
-  }
+  // Initialize each content field
+  create(dynamicContent) {
+    Object.keys(this.config.content).forEach(field => {
+      if (!dynamicContent[field]) {
+        this.logError(`${field} doesn't exist in the template:`, Object.keys(dynamicContent));
+      } else if (typeof this.config.content[field] !== 'function') {
+        this.logError(`${field} should be a function`);
+      } else {
+        let lastErrorMessage = null;
 
-  getDynamicContent() {
-    try {
-      const { advertiserId = 0, adsetId, templateId } = this.config;
-      const xhr = new XMLHttpRequest();
+        const creationAttempt = setInterval(() => {
+          try {
+            // Execute the custom function
+            this.config.content[field](dynamicContent[field].value);
+            clearInterval(creationAttempt);
+            this.createdContentFields += 1;
 
-      xhr.open(
-        'POST',
-        `https://d.lemonpi.io/a/${advertiserId}/content/${adsetId}-${templateId}`,
-        false, // Sync for now
-      );
+            // On the final successful content field
+            if (Object.keys(this.config.content).length === this.createdContentFields) {
+              this.logSuccess('Successfully created soft landing');
 
-      xhr.setRequestHeader('Content-Type', 'application/json');
+              const eventString = JSON.stringify({
+                type: 'impression',
+                schema: 'adset-creative',
+                adsetId: this.config.adsetId,
+                creativeId: this.config.templateId,
+              });
 
-      xhr.send(
-        JSON.stringify({
-          context: {
-            'query-parameters': getUrlQueryParameters(),
-          },
-        }),
-      );
-
-      if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
-        return JSON.parse(xhr.responseText);
+              // Send an impression pixel
+              try {
+                fetch(`https://d.lemonpi.io/track/event?e=${encodeURIComponent(eventString)}`);
+              } catch (_) {} // eslint-disable-line no-empty
+            }
+          } catch ({ message }) {
+            if (lastErrorMessage !== message) {
+              lastErrorMessage = message;
+              this.logError(field, message);
+            }
+          }
+        }, this.config.interval);
       }
-    } catch ({ message }) {
-      this.addError('Please check your adset and template IDs', message);
-    }
-
-    return undefined;
+    });
   }
 
-  sendImpression() {
-    try {
-      const { adsetId, templateId } = this.config;
-      const xhr = new XMLHttpRequest();
-      const payload = {
-        type: 'impression',
-        schema: 'adset-creative',
-        adsetId,
-        creativeId: templateId,
-      };
-
-      xhr.open(
-        'GET',
-        `https://d.lemonpi.io/track/event?e=${encodeURIComponent(JSON.stringify(payload))}`,
-        true,
-      );
-
-      xhr.send();
-    } catch (_) {} // eslint-disable-line no-empty
-  }
-
-  create() {
-    // Clear errors for every new attempt
-    this.errors = {};
-
-    // Check for required IDs
-    ['adsetId', 'templateId'].forEach(requiredField => {
+  init() {
+    // Check required fields
+    Object.keys(requiredFields).forEach(requiredField => {
       if (!this.config[requiredField]) {
-        this.addError(requiredField, 'is required and missing');
-      } else if (typeof this.config[requiredField] !== 'number') {
-        this.addError(requiredField, 'should be a number');
+        this.logError(`${requiredField} is required and missing`);
+        // eslint-disable-next-line valid-typeof
+      } else if (typeof this.config[requiredField] !== requiredFields[requiredField]) {
+        this.logError(`${requiredField} should be a ${requiredFields[requiredField]}`);
       }
     });
 
-    this.dynamicContent = this.getDynamicContent();
-
     // Test the URL for admittance
     if (!this.config.urlTest.test(window.location.href)) {
-      this.addError('The URL', `doesn't match "${this.config.urlTest.toString()}"`);
+      this.logError(`The URL doesn't match "${this.config.urlTest.toString()}"`);
     }
 
-    if (this.dynamicContent) {
-      Object.keys(this.config.content).forEach(field => {
-        if (!this.dynamicContent[field]) {
-          this.addError(field, "doesn't exist in the template:", Object.keys(this.dynamicContent));
-        } else if (typeof this.config.content[field] !== 'function') {
-          this.addError(field, 'should be a function');
-        } else {
-          let lastErrorMessage = null;
+    if (!this.hasErrors) {
+      const { advertiserId = 0, adsetId, templateId } = this.config;
+      const options = {
+        method: 'POST',
+        body: { context: { 'query-parameters': getUrlQueryParameters() } },
+      };
 
-          const attempt = setInterval(() => {
-            try {
-              this.config.content[field](this.dynamicContent[field].value);
-              clearInterval(attempt);
-              this.successfulFields += 1;
-
-              if (Object.keys(this.config.content).length === this.successfulFields) {
-                this.logSuccess('Successfully created soft landing');
-                this.sendImpression();
-              }
-            } catch ({ message }) {
-              if (lastErrorMessage !== message) {
-                lastErrorMessage = message;
-                this.addError(field, message);
-                this.logErrors();
-              }
-            }
-          }, this.config.interval);
-        }
-      });
+      // Retrieve the dynamic content data
+      try {
+        fetch(
+          `https://d.lemonpi.io/a/${advertiserId}/content/${adsetId}-${templateId}`,
+          this.create.bind(this),
+          options,
+        );
+      } catch ({ message }) {
+        this.logError('Something went wrong while retrieving dynamic content:', message);
+      }
     }
-
-    this.logErrors();
   }
 }

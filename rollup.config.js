@@ -1,16 +1,15 @@
-import resolve from 'rollup-plugin-node-resolve';
-import { terser } from 'rollup-plugin-terser';
+import { uglify } from 'rollup-plugin-uglify';
 import babel from 'rollup-plugin-babel';
-import json from 'rollup-plugin-json';
 import moment from 'moment';
 import { name, version, main, module } from './package.json';
 
+const input = 'src/main.js';
 const banner = `/*! ${name} v${version} ${moment().format('YYYY/MM/DD')} */`;
 
 export default [
   {
-    input: 'src/main.js',
-    plugins: [resolve(), json(), babel(), terser({ output: { comments: /^!/ } })],
+    input,
+    plugins: [babel(), uglify({ output: { comments: /^!/ } })],
     output: {
       banner,
       file: main,
@@ -19,8 +18,7 @@ export default [
     },
   },
   {
-    input: 'src/main.js',
-    plugins: [resolve(), json()],
+    input,
     output: {
       banner,
       file: module,

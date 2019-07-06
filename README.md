@@ -46,13 +46,13 @@ Or directly in the browser:
 - **`content`** (`object` of `function` values)
   - **`...`** (`function`)
     The key has to match with a preexisting content field in LemonPI. Use the `value` argument to do something with the dynamic content result for this field.
-- **`templateId`** (`regex`)
+- **`templateId`** (`number`)
   The template ID derrived from LemonPI.
-- **`adsetId`** (`regex`)
+- **`adsetId`** (`number`)
   The adset ID derrived from LemonPI.
 - **`urlTest`** (`regex`)
   Only initialize when this regular expression matches `window.location.href`.
-- **`interval`** (`number`, default: `500`)
+- **`interval`** (`number`, default: `100`)
   The delay between execution attempts in milliseconds.
 - **`debug`** (`boolean`, default: `/lemonpi_debug/i.test(window.location.href)`)
   Enables console debugging.

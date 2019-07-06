@@ -1,5 +1,4 @@
-import { version as pkgversion } from '../package.json';
 import SoftLanding from './SoftLanding';
 
-export const version = pkgversion;
+// eslint-disable-next-line import/prefer-default-export
 export const create = (...args) => new SoftLanding(...args);
