@@ -11,10 +11,11 @@ export const getUrlQueryParameters = () =>
       {},
     );
 
-export const fetch = (url, resolve = () => {}, { method = 'GET', body }) => {
+export const fetch = (url, resolve = () => {}, options = {}) => {
+  const { method = 'GET', body } = options;
   let rejected = false;
 
-  const timeout = setTimeout(() => {
+  const requestTimeout = setTimeout(() => {
     rejected = true;
     throw new Error('Request timed out');
   }, 3000);
@@ -24,7 +25,7 @@ export const fetch = (url, resolve = () => {}, { method = 'GET', body }) => {
 
   xhr.onreadystatechange = () => {
     if (xhr.readyState === XMLHttpRequest.DONE) {
-      clearTimeout(timeout);
+      clearTimeout(requestTimeout);
 
       if (xhr.status === 200) {
         try {

@@ -1,6 +1,6 @@
 {
   "name": "lemonpi-soft-landing-helper",
-  "version": "1.0.0-alpha.3",
+  "version": "1.0.0",
   "description": "Easily create LemonPI dynamic soft landings on webpages, based on URL query string context, by automatically executing conditions for each content field.",
   "main": "dist/bundle.umd.js",
   "module": "dist/bundle.esm.js",
