@@ -41,7 +41,7 @@ Or directly in the browser:
 
 ## API
 
-##### `create(Object)`
+#### `create(Object)`
 
 - **`content`** (`object` of `function` values)
   - **`...`** (`function`)
@@ -56,7 +56,3 @@ Or directly in the browser:
   The delay between execution attempts in milliseconds.
 - **`debug`** (`boolean`, default: `/lemonpi_debug/i.test(window.location.href)`)
   Enables console debugging.
-
-##### `version` (`string`)
-
-Semver package version of this library, e.g. `"1.0.0"`.
