@@ -12,6 +12,7 @@ export default class SoftLanding {
     this.createdContentFields = 0;
     this.hasErrors = false;
     this.config = {
+      context: () => ({ 'query-parameters': getUrlQueryParameters() }),
       debug: /lemonpi_debug/i.test(window.location.href),
       interval: 100,
       urlTest: /$/,
@@ -100,7 +101,7 @@ export default class SoftLanding {
       const { advertiserId = 0, adsetId, templateId } = this.config;
       const options = {
         method: 'POST',
-        body: { context: { 'query-parameters': getUrlQueryParameters() } },
+        body: { context: this.config.context() },
       };
 
       // Retrieve the dynamic content data

@@ -11,6 +11,8 @@ export const getUrlQueryParameters = () =>
       {},
     );
 
+export const getUrlQueryParameter = key => getUrlQueryParameters()[key];
+
 export const fetch = (url, resolve = () => {}, options = {}) => {
   const { method = 'GET', body } = options;
   let rejected = false;
