@@ -43,12 +43,12 @@ Or directly in the browser:
 
 #### `create(Object)`
 
-- **`content`** (`object` of `function` values)
+- **`content`** (`object` of `function` values, required)
   - **`...`** (`function`)
     The key has to match with a preexisting content field in LemonPI. Use the `value` argument to do something with the dynamic content result for this field.
-- **`templateId`** (`number`)
+- **`templateId`** (`number`, required)
   The template ID derrived from LemonPI.
-- **`adsetId`** (`number`)
+- **`adsetId`** (`number`, required)
   The adset ID derrived from LemonPI.
 - **`urlTest`** (`regex`)
   Only initialize when this regular expression matches `window.location.href`.
@@ -56,3 +56,12 @@ Or directly in the browser:
   The delay between execution attempts in milliseconds.
 - **`debug`** (`boolean`, default: `/lemonpi_debug/i.test(window.location.href)`)
   Enables console debugging.
+- **`context`** (`function` returning an `object`, default: `() => ({ 'query-parameters': getUrlQueryParameters() })`)
+
+#### `getUrlQueryParameter(String)` (`string`)
+
+Retrieves a query string parameter value from the URL. E.g. `"http://www.example.com/?foo=bar"` → `getUrlQueryParameter('foo')` returns `"bar"`.
+
+#### `getUrlQueryParameters()` (`object` of `string` values)
+
+Retrieves all query string parameters from the URL.
