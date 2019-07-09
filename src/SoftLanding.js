@@ -62,6 +62,7 @@ export default class SoftLanding {
                 type: 'impression',
                 schema: 'adset-creative',
                 adsetId: this.config.adsetId,
+                // Using template ID instead of creative ID (approved by Michael Witlox)
                 creativeId: this.config.templateId,
               });
 
@@ -98,10 +99,10 @@ export default class SoftLanding {
     }
 
     if (!this.hasErrors) {
-      const { advertiserId = 0, adsetId, templateId } = this.config;
+      const { advertiserId = 0, adsetId, templateId, context } = this.config;
       const options = {
         method: 'POST',
-        body: { context: this.config.context() },
+        body: { context: context() },
       };
 
       // Retrieve the dynamic content data
