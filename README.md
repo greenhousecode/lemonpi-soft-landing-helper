@@ -33,7 +33,7 @@ create({
 Or directly in the browser:
 
 ```html
-<script src="https://unpkg.com/lemonpi-soft-landing-helper/dist/bundle.umd.js"></script>
+<script src="https://unpkg.com/lemonpi-soft-landing-helper"></script>
 <script>
   window.lemonpiSoftLandingHelper.create({ ... });
 </script>

@@ -10,10 +10,10 @@
   "scripts": {
     "lint": "eslint --ignore-path .gitignore .",
     "build": "rollup -c",
-    "dev": "rollup -c -w",
-    "prepare": "npm run lint && npm run build",
-    "precommit": "npm run lint"
+    "dev": "rollup -cw",
+    "prepare": "npm run lint && npm run build"
   },
+  "pre-commit": "lint",
   "author": "Rick Stevens <rick.stevens@greenhousegroup.com> (http://www.greenhousegroup.com/)",
   "repository": "github:greenhousecode/lemonpi-soft-landing-helper",
   "license": "ISC",
@@ -28,6 +28,7 @@
     "eslint-plugin-import": "^2.18.0",
     "eslint-plugin-prettier": "^3.1.0",
     "moment": "^2.24.0",
+    "pre-commit": "^1.2.2",
     "prettier": "^1.18.2",
     "rollup": "^1.16.7",
     "rollup-plugin-babel": "^4.3.3",
